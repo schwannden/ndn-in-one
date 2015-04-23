@@ -32,7 +32,7 @@ opkg install vim git;
 opkg install pkgconfig openssl sqlite3;
 EOF
 imageURL='http://sourceforge.net/projects/ndn-in-one/files/image.tar.gz'
-rootURLL='http://sourceforge.net/projects/ndn-in-one/files/root.tar.gz'
+rootURL='http://sourceforge.net/projects/ndn-in-one/files/root.tar.gz'
 
 ########################################
 # detect operating system              #
@@ -146,16 +146,25 @@ then
   then
     echo "continuing....."
     source /opt/ndn/environment-setup-i586-poky-linux-uclibc
+    response=n
   else
-    exit
+    printf "download headers, libraries, and binaries? [y]"
+    read response
   fi
-else
+fi
+
+if [ $response == y ]
+then
   wget $rootURL
   tar -xzvf root.tar.gz
   cd root
   export PKG_CONFIG_SYSROOT_DIR=`pwd`
   exit
+else
+  echo "Good bye then~"
+  exit
 fi
+
 
 cd $PKG_CONFIG_SYSROOT_DIR
 echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
