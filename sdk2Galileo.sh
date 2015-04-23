@@ -31,6 +31,8 @@ opkg install --force-overwrite uclibc;
 opkg install vim git;
 opkg install pkgconfig openssl sqlite3;
 EOF
+imageURL='http://sourceforge.net/projects/ndn-in-one/files/image.tar.gz'
+rootURLL='http://sourceforge.net/projects/ndn-in-one/files/root.tar.gz'
 
 ########################################
 # detect operating system              #
@@ -135,15 +137,35 @@ function getOptions
 ########################################
 getOptions "$@"
 
+if [ -e /opt/ndn/environment-setup-i586-poky-linux-uclibc ]
+then
+  echo "detecting tool chain installed in /opt/ndn"
+  printf "do you want to $mode from toolchain? [y]"
+  read response
+  if [ $response == y ]
+  then
+    echo "continuing....."
+    source /opt/ndn/environment-setup-i586-poky-linux-uclibc
+  else
+    exit
+  fi
+else
+  wget $rootURL
+  tar -xzvf root.tar.gz
+  cd root
+  export PKG_CONFIG_SYSROOT_DIR=`pwd`
+  exit
+fi
+
+cd $PKG_CONFIG_SYSROOT_DIR
+echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
+
 if [ $mode == copy ]
 then
   echo "Transfering $part of $target"
 
   printf "Enter your Galileo IP: "
   read GalileoIP
-  source /opt/ndn/environment-setup-i586-poky-linux-uclibc
-  cd $PKG_CONFIG_SYSROOT_DIR
-  echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
 
   if [ $target == "cryptopp" -o $target == all ]
   then
