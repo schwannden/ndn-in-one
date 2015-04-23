@@ -8,7 +8,7 @@ read -d '' help <<- EOF
 Usage: ./$thisFile
 options:
      -m  mode [default is copy]
-         [copy | configure]
+         [copy | configure | get]
      -h  display this message
   ## The following flags are only valid in copy mode ##
      -f  files to copy [default is all]
@@ -74,6 +74,9 @@ function getOptions
         elif [ "$OPTARG" = "configure" ]
         then
           mode='configure'
+        elif [ "$OPTARG" = "get" ]
+        then
+          mode='get'
         else
           echo "option -$opt must be one of [copy | configure]"
           echo "$help"
@@ -151,6 +154,9 @@ then
     printf "download headers, libraries, and binaries? [y]"
     read response
   fi
+elif
+  echo "can not detect toolchain, download headers, libraries, and binaries? [y]"
+then
 fi
 
 if [ $response == y ]
@@ -223,4 +229,10 @@ then
   echo $initScript | xargs ssh root@$GalileoIP 
   exit
   echo $initScript | ssh root@$GalileoIP cat >> init.sh && chmod +x init.sh ; ./init.sh
+fi
+
+if [ $mode == get ]
+then
+  echo "getting galileo image... get a cup of tea..."
+  wget $imageURL
 fi
