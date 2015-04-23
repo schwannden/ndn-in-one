@@ -7,23 +7,30 @@ thisFile=`basename $0`
 read -d '' help <<- EOF
 Usage: ./$thisFile
 options:
+     -m  mode [default is copy]
+         [copy | configure]
+     -h  display this message
+  ## The following flags are only valid in copy mode ##
      -f  files to copy [default is all]
          [all | ndn-cxx | nfd | cryptopp | conf]
      -a  copy everything [default]
      -l  copy libraries
      -b  copy binaries
      -i  copy headers
-     -h  display this message
 EOF
-
-exit
 
 ########################################
 # Set default values                   #
 ########################################
 target='all'
 part='all'
-
+mode='copy'
+read -d '' initScript <<- EOF
+opkg update;
+opkg install --force-overwrite uclibc;
+opkg install vim git;
+opkg install pkgconfig openssl sqlite3;
+EOF
 
 ########################################
 # detect operating system              #
@@ -55,9 +62,22 @@ function getOptions
     exit
   fi
   
-  while getopts ":f:albih" opt
+  while getopts ":m:f:albih" opt
   do
     case $opt in
+      m)
+        if [ "$OPTARG" = "copy" ]
+        then
+          mode='copy'
+        elif [ "$OPTARG" = "configure" ]
+        then
+          mode='configure'
+        else
+          echo "option -$opt must be one of [copy | configure]"
+          echo "$help"
+          exit
+        fi
+        ;;
       f)
         if [ "$OPTARG" = "all" ]
         then
@@ -110,52 +130,66 @@ function getOptions
   done
 }
 
-detectOS
+########################################
+# main program                         #
+########################################
 getOptions "$@"
-echo "Transfering $part of $target"
 
-printf "Enter your Galileo IP: "
-read GalileoIP
-source /opt/ndn/environment-setup-i586-poky-linux-uclibc
-cd $PKG_CONFIG_SYSROOT_DIR
-echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
-
-if [ $target == "cryptopp" -o $target == all ]
+if [ $mode == copy ]
 then
-  echo "Moving cryptopp headers to $GalileoIP"
-  scp -r include/cryptopp root@$GalileoIP:/include
-  echo "Moving cryptopp libraries to $GalileoIP"
-  scp lib/libcryptopp.so root@$GalileoIP:/lib
+  echo "Transfering $part of $target"
+
+  printf "Enter your Galileo IP: "
+  read GalileoIP
+  source /opt/ndn/environment-setup-i586-poky-linux-uclibc
+  cd $PKG_CONFIG_SYSROOT_DIR
+  echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
+
+  if [ $target == "cryptopp" -o $target == all ]
+  then
+    echo "Moving cryptopp headers to $GalileoIP"
+    scp -r include/cryptopp root@$GalileoIP:/include
+    echo "Moving cryptopp libraries to $GalileoIP"
+    scp lib/libcryptopp.so root@$GalileoIP:/lib
+  fi
+  if [ $target == "ndn-cxx"  -o $target == all ]
+  then
+    echo "Moving ndn-cxx headers to $GalileoIP"
+    scp -r  usr/include/ndn-cxx root@$GalileoIP:/usr/include
+    echo "Moving ndn-cxx libraries to $GalileoIP"
+    scp usr/lib/libndn-cxx.a root@$GalileoIP:/usr/lib
+    echo "Moving ndn binaries to $GalileoIP"
+    scp -r usr/bin/ndn* root@$GalileoIP:/bin
+  fi
+  if [ $target == "nfd"      -o $target == all ]
+  then
+    echo "Moving nfd binaries to $GalileoIP"
+    scp -r usr/bin/nfd* root@$GalileoIP:/bin
+  fi
+  if [ $target == "conf"     -o $target == all ]
+  then
+    echo "Moving /usr/etc/ndn startup scripts to $GalileoIP"
+    ssh root@$GalileoIP 'mkdir -p /opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/'
+    scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
+    scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
+  
+    echo "Moving base-feeds.conf startup scripts to $GalileoIP"
+    echo "src/gz all     http://repo.opkg.net/galileo/repo/all" > base-feeds.conf
+    echo "src/gz clanton http://repo.opkg.net/galileo/repo/clanton" >> base-feeds.conf
+    echo "src/gz i586    http://repo.opkg.net/galileo/repo/i586" >> base-feeds.conf
+    scp base-feeds.conf root@$GalileoIP:/etc/opkg/
+    rm -f base-feeds.conf
+  fi
+  echo "========== copying complete ========="
 fi
 
-if [ $target == "ndn-cxx" -o $target == all ]
+if [ $mode == configure ]
 then
-  echo "Moving ndn-cxx headers to $GalileoIP"
-  scp -r  usr/include/ndn-cxx root@$GalileoIP:/usr/include
-  echo "Moving ndn-cxx libraries to $GalileoIP"
-  scp usr/lib/libndn-cxx.a root@$GalileoIP:/usr/lib
-  echo "Moving ndn binaries to $GalileoIP"
-  scp -r usr/bin/ndn* root@$GalileoIP:/bin
+  printf "Enter your Galileo IP: "
+  read GalileoIP
+  echo "The following commands will be run:"
+  echo $initScript
+  echo $initScript | xargs ssh root@$GalileoIP 
+  exit
+  echo $initScript | ssh root@$GalileoIP cat >> init.sh && chmod +x init.sh ; ./init.sh
 fi
-
-if [ $target == "nfd" -o $target == all ]
-then
-  echo "Moving nfd binaries to $GalileoIP"
-  scp -r usr/bin/nfd* root@$GalileoIP:/bin
-fi
-
-if [ $target == "conf" -o $target == all ]
-then
-  echo "Moving /usr/etc/ndn startup scripts to $GalileoIP"
-  scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
-  scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
-
-  echo "Moving base-feeds.conf startup scripts to $GalileoIP"
-  echo "src/gz all     http://repo.opkg.net/galileo/repo/all" > base-feeds.conf
-  echo "src/gz clanton http://repo.opkg.net/galileo/repo/clanton" >> base-feeds.conf
-  echo "src/gz i586    http://repo.opkg.net/galileo/repo/i586" >> base-feeds.conf
-  scp base-feeds.conf root@$GalileoIP:/etc/opkg/
-  rm -f base-feeds.conf
-fi
-
-echo "========== done ========="
