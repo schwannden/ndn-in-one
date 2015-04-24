@@ -5,11 +5,19 @@ To see more detail, visit [NDN on Galileo](www.gitbook.com/book/schwannden/ndn-o
 
 ## Tutorial
 to download Galileo image
+
 `
-./sdk2Galileo -m get
+./sdk2Galileo -m get image
 `
 
-to copy all binaries, libraries, headers to Galileo
+to download ndn headers, libraries, binaries
+
+`
+./sdk2Galileo -m get ndn
+`
+
+to copy all ndn headers, libraries, binaries to Galileo
+
 `
 ./sdk2Galileo -a
 `
@@ -17,6 +25,7 @@ to copy all binaries, libraries, headers to Galileo
 In the process, the script will ask you to download required files and your Galileo IP
 
 to configure everything on Galileo
+
 `
 ./sdk2Galileo -m configure
 `
