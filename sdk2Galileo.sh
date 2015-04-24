@@ -135,10 +135,50 @@ function getOptions
   done
 }
 
+
+########################################
+# get module                           #
+########################################
+function get {
+  if [ -z $3]
+  then
+    getHelp=true
+  else
+    if [ $3 = "image" ]
+    then
+      echo "getting galileo image... get a cup of tea..."
+      wget $imageURL
+      getHelp=false
+    elif [ $3 = "ndn" ]
+    then
+      echo "getting all the ndn/nfd headers, libraries, and binaries..."
+      wget $rootURL
+      getHelp=false
+    else
+      getHelp=true
+    fi
+  fi
+  if [ $getHelp == true ]
+  then
+    echo "    Usage: ./$thisFile -m get [image | ndn]"
+    echo "    to obtain Galileo's linux image:"
+    echo "       ./$thisFile -m get image"
+    echo "    to obtain ndn/nfd's headers, libraries, and binaries"
+    echo "       ./$thisFile -m get ndn"
+    exit
+  fi
+}
+
 ########################################
 # main program                         #
 ########################################
 getOptions "$@"
+
+if [ $mode == get ]
+then
+  get "$@"
+  exit
+fi
 
 if [ -e /opt/ndn/environment-setup-i586-poky-linux-uclibc ]
 then
@@ -154,9 +194,9 @@ then
     printf "download headers, libraries, and binaries? [y]"
     read response
   fi
-elif
+else
   echo "can not detect toolchain, download headers, libraries, and binaries? [y]"
-then
+  read response
 fi
 
 if [ $response == y ]
@@ -165,12 +205,10 @@ then
   tar -xzvf root.tar.gz
   cd root
   export PKG_CONFIG_SYSROOT_DIR=`pwd`
-  exit
 else
   echo "Good bye then~"
   exit
 fi
-
 
 cd $PKG_CONFIG_SYSROOT_DIR
 echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
@@ -227,12 +265,9 @@ then
   echo "The following commands will be run:"
   echo $initScript
   echo $initScript | xargs ssh root@$GalileoIP 
-  exit
-  echo $initScript | ssh root@$GalileoIP cat >> init.sh && chmod +x init.sh ; ./init.sh
+  echo "customizing nfd-start"
+  scp nfd-start root@$GalileoIP:/bin
+  echo "customizing nfd-stop"
+  scp nfd-stop  root@$GalileoIP:/bin
 fi
 
-if [ $mode == get ]
-then
-  echo "getting galileo image... get a cup of tea..."
-  wget $imageURL
-fi
