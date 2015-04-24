@@ -33,6 +33,7 @@ opkg install pkgconfig openssl sqlite3;
 EOF
 imageURL='http://sourceforge.net/projects/ndn-in-one/files/image.tar.gz'
 rootURL='http://sourceforge.net/projects/ndn-in-one/files/root.tar.gz'
+response=n
 
 ########################################
 # detect operating system              #
@@ -137,7 +138,7 @@ function getOptions
 
 
 ########################################
-# get module                           #
+# get : get image or toolchain         #
 ########################################
 function get {
   if [ -z $3]
@@ -170,6 +171,66 @@ function get {
 }
 
 ########################################
+# setupToolchain detect and setup tool #
+########################################
+function setupToolchain {
+if [ -e root.tar.gz ]
+then
+  echo "detecting tool chain installed in" `pwd`
+  printf "do you want to use this toolchain? [y]"
+  read response
+  if [ $response == y ]
+  then
+    if [ -e root ]
+    then 
+      :
+    else
+      echo "decompressing tool chain"
+      tar -xzvf root.tar.gz
+    fi
+    response='root'
+  fi
+fi
+
+if [ $response != root ]
+then
+  if [ -e /opt/ndn/environment-setup-i586-poky-linux-uclibc ]
+  then
+    echo "detecting tool chain installed in /opt/ndn"
+    printf "do you want to use this toolchain? [y]"
+    read response
+    if [ $response == y ]
+    then
+      echo "continuing....."
+      source /opt/ndn/environment-setup-i586-poky-linux-uclibc
+      response=yocto
+    else
+      printf "download headers, libraries, and binaries? [y]"
+      read response
+    fi
+  else
+    echo "can not detect toolchain, download headers, libraries, and binaries? [y]"
+    read response
+  fi
+fi
+
+if [ $response == y ]
+then
+  wget $rootURL
+  tar -xzvf root.tar.gz
+  cd root
+  export PKG_CONFIG_SYSROOT_DIR=`pwd`
+elif [ $response == root ]
+then
+  cd root
+  export PKG_CONFIG_SYSROOT_DIR=`pwd`
+else
+  echo "Good bye then~"
+  exit
+fi
+}
+
+########################################
 # main program                         #
 ########################################
 getOptions "$@"
@@ -180,39 +241,12 @@ then
   exit
 fi
 
-if [ -e /opt/ndn/environment-setup-i586-poky-linux-uclibc ]
+if [ $mode == copy ]
 then
-  echo "detecting tool chain installed in /opt/ndn"
-  printf "do you want to $mode from toolchain? [y]"
-  read response
-  if [ $response == y ]
-  then
-    echo "continuing....."
-    source /opt/ndn/environment-setup-i586-poky-linux-uclibc
-    response=n
-  else
-    printf "download headers, libraries, and binaries? [y]"
-    read response
-  fi
-else
-  echo "can not detect toolchain, download headers, libraries, and binaries? [y]"
-  read response
+  setupToolchain 
+  cd $PKG_CONFIG_SYSROOT_DIR
+  echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
 fi
-
-if [ $response == y ]
-then
-  wget $rootURL
-  tar -xzvf root.tar.gz
-  cd root
-  export PKG_CONFIG_SYSROOT_DIR=`pwd`
-else
-  echo "Good bye then~"
-  exit
-fi
-
-cd $PKG_CONFIG_SYSROOT_DIR
-echo "switching directory to $PKG_CONFIG_SYSROOT_DIR"
-
 if [ $mode == copy ]
 then
   echo "Transfering $part of $target"
