@@ -224,6 +224,9 @@ elif [ $response == root ]
 then
   cd root
   export PKG_CONFIG_SYSROOT_DIR=`pwd`
+elif [ $response == yocto ]
+then
+  :
 else
   echo "Good bye then~"
   exit
