@@ -234,13 +234,6 @@ fi
 }
 
 ########################################
-# Wrapper function                     #
-########################################
-function Scp {
-  scp -P $port "$@"
-}
-
-########################################
 # GetIP : get ssh IP and port          #
 ########################################
 function getIP {
@@ -278,36 +271,36 @@ then
   if [ $target == "cryptopp" -o $target == all ]
   then
     echo "Moving cryptopp headers to $GalileoIP"
-    Scp -r include/cryptopp root@$GalileoIP:/include
+    scp -r include/cryptopp root@$GalileoIP:/include
     echo "Moving cryptopp libraries to $GalileoIP"
-    Scp lib/libcryptopp.so root@$GalileoIP:/lib
+    scp lib/libcryptopp.so root@$GalileoIP:/lib
   fi
   if [ $target == "ndn-cxx"  -o $target == all ]
   then
     echo "Moving ndn-cxx headers to $GalileoIP"
-    Scp -r usr/include/ndn-cxx root@$GalileoIP:/usr/include
+    scp -r  usr/include/ndn-cxx root@$GalileoIP:/usr/include
     echo "Moving ndn-cxx libraries to $GalileoIP"
-    Scp usr/lib/libndn-cxx.a root@$GalileoIP:/usr/lib
+    scp usr/lib/libndn-cxx.a root@$GalileoIP:/usr/lib
     echo "Moving ndn binaries to $GalileoIP"
-    Scp -r usr/bin/ndn* root@$GalileoIP:/bin
+    scp -r usr/bin/ndn* root@$GalileoIP:/bin
   fi
   if [ $target == "nfd"      -o $target == all ]
   then
     echo "Moving nfd binaries to $GalileoIP"
-    Scp -r usr/bin/nfd* root@$GalileoIP:/bin
+    scp -r usr/bin/nfd* root@$GalileoIP:/bin
   fi
   if [ $target == "conf"     -o $target == all ]
   then
     echo "Moving /usr/etc/ndn startup scripts to $GalileoIP"
-    ssh -p $port root@$GalileoIP 'mkdir -p /opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/'
-    Scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
-    Scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
+    ssh root@$GalileoIP 'mkdir -p /opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/'
+    scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
+    scp -r usr/etc/ndn root@$GalileoIP:/opt/ndn/sysroots/i586-poky-linux-uclibc/usr/etc/
   
     echo "Moving base-feeds.conf startup scripts to $GalileoIP"
     echo "src/gz all     http://repo.opkg.net/galileo/repo/all" > base-feeds.conf
     echo "src/gz clanton http://repo.opkg.net/galileo/repo/clanton" >> base-feeds.conf
     echo "src/gz i586    http://repo.opkg.net/galileo/repo/i586" >> base-feeds.conf
-    Scp base-feeds.conf root@$GalileoIP:/etc/opkg/
+    scp base-feeds.conf root@$GalileoIP:/etc/opkg/
     rm -f base-feeds.conf
   fi
   echo "========== copying complete ========="
@@ -318,10 +311,10 @@ then
   getIP
   echo "The following commands will be run:"
   echo $initScript
-  echo $initScript | xargs ssh -p $port root@$GalileoIP 
+  echo $initScript | xargs ssh root@$GalileoIP 
   echo "customizing nfd-start"
-  Scp nfd-start root@$GalileoIP:/bin
+  scp nfd-start root@$GalileoIP:/bin
   echo "customizing nfd-stop"
-  Scp nfd-stop  root@$GalileoIP:/bin
+  scp nfd-stop  root@$GalileoIP:/bin
 fi
 
