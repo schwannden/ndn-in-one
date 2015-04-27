@@ -29,3 +29,18 @@ to configure everything on Galileo
 `
 ./sdk2Galileo -m configure
 `
+
+Use `./sdk2Galileo -h` to display this help message:
+
+```
+     -m  mode [default is copy]
+         [copy | configure | get]
+     -h  display this message
+  ## The following flags are only valid in copy mode ##
+     -f  files to copy [default is all]
+         [all | ndn-cxx | nfd | cryptopp | conf]
+     -a  copy everything [default]
+     -l  copy libraries
+     -b  copy binaries
+     -i  copy headers
+```
