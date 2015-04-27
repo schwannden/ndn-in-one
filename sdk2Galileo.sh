@@ -244,7 +244,7 @@ function Scp {
 # GetIP : get ssh IP and port          #
 ########################################
 function getIP {
-printf "Enter your Galileo IP(deault port is 22, change if by entering IP:port): "
+printf "Enter your Galileo IP(deault port is 22, change it by entering IP:port): "
   read GalileoIP
   t=`echo $GalileoIP | cut -d ":" -f2`
   if [ $t != $GalileoIP ]
