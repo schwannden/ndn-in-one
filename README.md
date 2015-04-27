@@ -19,7 +19,7 @@ to download ndn headers, libraries, binaries
 to copy all ndn headers, libraries, binaries to Galileo
 
 `
-./sdk2Galileo -a
+./sdk2Galileo -m copy
 `
 
 In the process, the script will ask you to download required files and your Galileo IP
