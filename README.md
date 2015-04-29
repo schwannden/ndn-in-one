@@ -45,9 +45,9 @@ Copy only `ndn-cxx` headers to Galileo
 ./sdk2Galileo -m copy -f ndn-cxx -i
 `
 
-Copy only `ndn-cxx` libraries to Galileo
+Copy only `nfd` binaries to Galileo
 `
-./sdk2Galileo -m copy -f ndn-cxx -l
+./sdk2Galileo -m copy -f nfd -b
 `
 
 In the process, the script will ask you to download required files and your Galileo IP
