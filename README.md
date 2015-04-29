@@ -4,31 +4,53 @@ This all in one script aimed to facilitae installation of NDN on Galileo.
 To see more detail, visit [NDN on Galileo](www.gitbook.com/book/schwannden/ndn-on-galileo/)
 
 ## Tutorial
-to download Galileo image
+To download Galileo image
 
 `
 ./sdk2Galileo -m get image
 `
 
-to download ndn headers, libraries, binaries
+See [boot from SD card](http://schwannden.gitbooks.io/ndn-on-galileo/content/boot_from_sd_card.html) for how to write image to SD card and boot Galileo from SD card image.
+
+To configure Galileo
+
+`
+./sdk2Galileo -a
+./sdk2Galileo -m configure
+`
+
+During the process, the script will ask you to download required toolchain (or detect your toolchain if you already have one), and ask you to input the IP address of your Galileo. So the computer running script need to be able to connect to the Galileo (if they are in the same LAN, it should be perfect).
+
+
+## More Tutorial
+To download ndn headers, libraries, binaries
 
 `
 ./sdk2Galileo -m get ndn
 `
 
-to copy all ndn headers, libraries, binaries to Galileo
+To copy all ndn headers, libraries, binaries to Galileo to galileo
 
 `
 ./sdk2Galileo -m copy
 `
 
+Copy only `ndn-cxx` to Galileo
+`
+./sdk2Galileo -m copy -f ndn-cxx
+`
+
+Copy only `ndn-cxx` headers to Galileo
+`
+./sdk2Galileo -m copy -f ndn-cxx -i
+`
+
+Copy only `ndn-cxx` libraries to Galileo
+`
+./sdk2Galileo -m copy -f ndn-cxx -l
+`
+
 In the process, the script will ask you to download required files and your Galileo IP
-
-to configure everything on Galileo
-
-`
-./sdk2Galileo -m configure
-`
 
 Use `./sdk2Galileo -h` to display this help message:
 
