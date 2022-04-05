@@ -31,8 +31,8 @@ opkg install --force-overwrite uclibc;
 opkg install vim git;
 opkg install pkgconfig openssl sqlite3;
 EOF
-imageURL='http://sourceforge.net/projects/ndn-in-one/files/image.tar.gz'
-rootURL='http://sourceforge.net/projects/ndn-in-one/files/root.tar.gz'
+imageURL='http://master.dl.sourceforge.net/project/ndn-in-one/image.tar.gz'
+rootURL='http://master.dl.sourceforge.net/project/ndn-in-one/root.tar.gz'
 response=n
 port=22
 
