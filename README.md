@@ -7,7 +7,7 @@ To see more detail, visit [NDN on Galileo](www.gitbook.com/book/schwannden/ndn-o
 To download Galileo image
 
 `
-./sdk2Galileo -m get image
+./sdk2Galileo.sh -m get image
 `
 
 See [boot from SD card](http://schwannden.gitbooks.io/ndn-on-galileo/content/boot_from_sd_card.html) for how to write image to SD card and boot Galileo from SD card image.
@@ -15,8 +15,8 @@ See [boot from SD card](http://schwannden.gitbooks.io/ndn-on-galileo/content/boo
 To configure Galileo
 
 `
-./sdk2Galileo -a
-./sdk2Galileo -m configure
+./sdk2Galileo.sh -a
+./sdk2Galileo.sh -m configure
 `
 
 During the process, the script will ask you to download required toolchain (or detect your toolchain if you already have one), and ask you to input the IP address of your Galileo. So the computer running script need to be able to connect to the Galileo (if they are in the same LAN, it should be perfect).
@@ -26,33 +26,33 @@ During the process, the script will ask you to download required toolchain (or d
 To download ndn headers, libraries, binaries
 
 `
-./sdk2Galileo -m get ndn
+./sdk2Galileo.sh -m get ndn
 `
 
 To copy all ndn headers, libraries, binaries to Galileo to galileo
 
 `
-./sdk2Galileo -m copy
+./sdk2Galileo.sh -m copy
 `
 
 Copy only `ndn-cxx` to Galileo
 `
-./sdk2Galileo -m copy -f ndn-cxx
+./sdk2Galileo.sh -m copy -f ndn-cxx
 `
 
 Copy only `ndn-cxx` headers to Galileo
 `
-./sdk2Galileo -m copy -f ndn-cxx -i
+./sdk2Galileo.sh -m copy -f ndn-cxx -i
 `
 
 Copy only `nfd` binaries to Galileo
 `
-./sdk2Galileo -m copy -f nfd -b
+./sdk2Galileo.sh -m copy -f nfd -b
 `
 
 In the process, the script will ask you to download required files and your Galileo IP
 
-Use `./sdk2Galileo -h` to display this help message:
+Use `./sdk2Galileo.sh -h` to display this help message:
 
 ```
      -m  mode [default is copy]
